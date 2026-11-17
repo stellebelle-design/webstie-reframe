@@ -52,6 +52,34 @@
         <a href="#planning" class="quick-card"><span class="quick-icon">⌁</span><span><strong>Meal planning</strong><small>Ideas to make the week easier</small></span><b aria-hidden="true">↗</b></a>
       </section>
 
+
+      <section class="admin-panel" id="adminPanel" hidden>
+        <div class="admin-heading">
+          <div><p class="eyebrow">PRIVATE ADMIN AREA</p><h2>Recipe <em>manager.</em></h2><p class="section-intro">Add recipes, update details and choose what your clients can see.</p></div>
+          <span class="admin-tag">ADMIN ONLY</span>
+        </div>
+        <form id="recipeAdminForm" class="admin-form">
+          <input type="hidden" id="adminRecipeId">
+          <div class="admin-form-grid">
+            <label>Recipe title<input id="adminTitle" required maxlength="140"></label>
+            <label>Category<select id="adminCategory" required><option value="breakfast">Breakfast</option><option value="lunch">Lunch</option><option value="dinner">Dinner</option><option value="snacks">Snacks &amp; sweet</option></select></label>
+            <label class="admin-wide">Short description<textarea id="adminDescription" rows="2"></textarea></label>
+            <label>Ingredients <small>One ingredient per line</small><textarea id="adminIngredients" rows="5" required></textarea></label>
+            <label>Method <small>One step per line</small><textarea id="adminInstructions" rows="5" required></textarea></label>
+            <label>Prep time (minutes)<input id="adminPrep" type="number" min="0"></label>
+            <label>Cook time (minutes)<input id="adminCook" type="number" min="0"></label>
+            <label>Calories per serving<input id="adminCalories" type="number" min="0"></label>
+            <label>Protein (g)<input id="adminProtein" type="number" min="0" step="0.1"></label>
+            <label>Carbohydrates (g)<input id="adminCarbs" type="number" min="0" step="0.1"></label>
+            <label>Fat (g)<input id="adminFat" type="number" min="0" step="0.1"></label>
+            <label class="admin-wide">Recipe photo<input id="adminImage" type="file" accept="image/jpeg,image/png,image/webp"><small>Optional. JPG, PNG or WebP. Keep images reasonably small.</small></label>
+          </div>
+          <label class="admin-publish"><input id="adminPublished" type="checkbox"> Publish this recipe so active clients can see it</label>
+          <div class="admin-actions"><button class="admin-save" type="submit" id="adminSave">Save recipe</button><button class="admin-cancel" type="button" id="adminCancel" hidden>Cancel edit</button><span id="adminMessage" role="status" aria-live="polite"></span></div>
+        </form>
+        <div class="admin-list-wrap"><h3>Your recipes</h3><div id="adminRecipeList" class="admin-recipe-list"></div></div>
+      </section>
+
       <section class="section recipes-section" id="recipes">
         <div class="section-heading">
           <div><p class="eyebrow">GOOD FOOD, NO FOOD RULES</p><h2>The Reframe <em>Kitchen.</em></h2><p class="section-intro">Everyday recipes with lovely ingredients, plenty of flavour and room to make them your own.</p></div>
