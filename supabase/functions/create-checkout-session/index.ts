@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
     }
 
     const product = products[productKey];
-    const priceId = Deno.env.get(product.priceEnv);
+    const priceId = Deno.env.get(product.priceEnv)?.trim();
     if (!priceId || !priceId.startsWith("price_")) {
       return Response.json({ error: "The selected product price has not been configured yet." }, { status: 500, headers: corsHeaders });
     }
