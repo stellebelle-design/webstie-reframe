@@ -49,8 +49,9 @@
   }
 
   // Always prevent the browser's default form navigation, even if auth is offline.
-  loginForm?.addEventListener("submit", async event => {
+  loginSubmit?.addEventListener("click", async event => {
     event.preventDefault();
+    if (loginForm && !loginForm.reportValidity()) return;
     if (!client) {
       showMessage("The sign-in service hasn't loaded. Please refresh the page and try again.");
       return;
