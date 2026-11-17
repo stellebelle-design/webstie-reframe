@@ -491,3 +491,15 @@ a:focus-visible, button:focus-visible {
   outline: 2px solid var(--stone);
   outline-offset: 3px;
 }
+
+/* THE REFRAME EXPERIENCE */
+.experience { padding: 140px var(--pad); background: var(--white); }
+.experience-head { max-width: 680px; margin: 0 auto 64px; text-align: center; }
+.experience-sub { margin-top: 20px; font-size: 1.02rem; }
+.experience-steps { max-width: 860px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 38px 56px; }
+.experience-step { display: grid; grid-template-columns: 48px 1fr; gap: 18px; align-items: start; padding-top: 22px; border-top: 1px solid var(--line); }
+.experience-number { font-family: var(--serif); font-size: 1.35rem; color: var(--stone); }
+.experience-step h3 { margin-bottom: 8px; }
+.experience-step p { font-size: 0.96rem; }
+.experience-note { max-width: 680px; margin: 52px auto 0; text-align: center; font-size: 0.9rem; color: var(--stone); }
+@media (max-width: 860px) { .experience-steps { grid-template-columns: 1fr; gap: 28px; } }
