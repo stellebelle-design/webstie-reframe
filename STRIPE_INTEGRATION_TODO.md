@@ -12,7 +12,7 @@ The following values are placeholders and must be updated before testing or goin
 
 | Field | Current Value | What to Set |
 |---|---|---|
-| `window.REFRAME_STRIPE_PUBLISHABLE_KEY` | `pk_test_REPLACE_WITH_YOUR_PUBLISHABLE_KEY` | Your Stripe test publishable key initially; use the live publishable key only after testing. |
+| `window.REFRAME_STRIPE_PUBLISHABLE_KEY` | `pk_test_pk_test_51UcsLYDqQdNR6pGodTL2WURb7owoxSOxUxWXlBsQ5CWGgpCqphIPQg4pqYpMV3Djfvk8t5OKjkqMfNsMKSfWaa3I00TCtYZbWE` | Your Stripe test publishable key initially; use the live publishable key only after testing. |
 | `STRIPE_SECRET_KEY` | Not set | Add your Stripe test secret key as a Supabase Edge Function secret. Never place it in a browser file or GitHub. |
 | `STRIPE_PRICE_PERSONALISED_PROGRAMME` | Not set | Price ID for the £30 one-off Personalised Training Programme. |
 | `STRIPE_PRICE_COACHING_4_WEEK` | Not set | Price ID for the £119 one-off 4-Week Coaching Programme. |
