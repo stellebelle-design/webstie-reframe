@@ -1,6 +1,6 @@
-// Secure sign-in gate: attach the form handler immediately so a slow session restore
-// can never make the browser submit/reload the login form by itself.
-(async function initialiseClientAccess(){
+// Client hub authentication. The login handler is attached even if the
+// Supabase CDN/config is unavailable, preventing a silent native form reload.
+(function initialiseClientAccess(){
   const loginScreen = document.querySelector("#loginScreen");
   const hubShell = document.querySelector("#hubShell");
   const loginForm = document.querySelector("#loginForm");
@@ -15,13 +15,11 @@
     loginMessage.dataset.state = isError ? "error" : "success";
   };
 
-  if (!window.supabase || !config?.url || !config?.publishableKey) {
-    showMessage("The sign-in service is not available just now. Please try again later.");
-    return;
+  let client = null;
+  if (window.supabase && config?.url && config?.publishableKey) {
+    client = window.supabase.createClient(config.url, config.publishableKey);
+    window.reframeSupabaseClient = client;
   }
-
-  const client = window.supabase.createClient(config.url, config.publishableKey);
-  window.reframeSupabaseClient = client;
 
   async function checkAccess(session) {
     if (!session?.user) {
@@ -50,10 +48,13 @@
     return true;
   }
 
-  // Register this before awaiting getSession(): otherwise a stalled session restore
-  // leaves the form with its browser-default submit/reload behaviour.
+  // Always prevent the browser's default form navigation, even if auth is offline.
   loginForm?.addEventListener("submit", async event => {
     event.preventDefault();
+    if (!client) {
+      showMessage("The sign-in service hasn't loaded. Please refresh the page and try again.");
+      return;
+    }
     if (loginSubmit) {
       loginSubmit.disabled = true;
       loginSubmit.textContent = "Signing in…";
@@ -81,6 +82,7 @@
   });
 
   signOutButton?.addEventListener("click", async () => {
+    if (!client) return;
     try {
       await client.auth.signOut();
       hubShell.hidden = true;
@@ -93,13 +95,17 @@
     }
   });
 
-  try {
-    const { data: { session } } = await client.auth.getSession();
-    await checkAccess(session);
-  } catch (error) {
-    console.error("Reframe Life session restore error:", error);
-    showMessage("We couldn't restore your previous session. Please try signing in below.");
+  if (!client) {
+    showMessage("The sign-in service hasn't loaded. Please refresh the page and try again.");
+    return;
   }
+
+  client.auth.getSession()
+    .then(({ data: { session } }) => checkAccess(session))
+    .catch(error => {
+      console.error("Reframe Life session restore error:", error);
+      showMessage("We couldn't restore your previous session. Please try signing in below.");
+    });
 })();
 
 let recipes = {
