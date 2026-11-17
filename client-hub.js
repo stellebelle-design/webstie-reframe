@@ -17,6 +17,7 @@
     return;
   }
   const client = window.supabase.createClient(config.url, config.publishableKey);
+  window.reframeSupabaseClient = client;
   async function checkAccess(session) {
     if (!session?.user) {
       hubShell.hidden = true;
@@ -83,7 +84,7 @@ async function loadPublishedRecipes(){
   if (!grid) return;
   grid.replaceChildren();
   if (count) count.textContent = "LOADING";
-  const { data, error } = await client
+  const { data, error } = await window.reframeSupabaseClient
     .from("recipes")
     .select("id,title,description,category,ingredients,instructions,image_url,prep_minutes,cook_minutes,calories,protein,carbohydrates,fat")
     .eq("is_published", true)
