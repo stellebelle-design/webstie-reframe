@@ -121,8 +121,8 @@
           unlockCheckout(data.session.user);
           showAccountStatus("Your account is ready. Please choose your programme below.");
         } else {
-          showAccountStatus("Almost there — we've sent a confirmation email. Please verify your email, then return to this page and sign in.");
           setAccountMode("signin");
+          showAccountStatus("Almost there — we've sent a confirmation email. Please verify your email, then return to this page and sign in.");
           emailInput.value = email;
         }
       } else {
