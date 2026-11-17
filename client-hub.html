@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The Reframe Life client resource hub — recipes, nutrition guides and practical tools.">
+  <title>Client Hub — Reframe Life</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500;600&family=Petit+Formal+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="client-hub.css">
+</head>
+<body>
+  <div class="hub-shell">
+    <header class="hub-header">
+      <a class="brand" href="index.html" aria-label="Reframe Life home">reframe <em>life</em></a>
+      <div class="header-right">
+        <span class="preview-label"><span></span> Design preview</span>
+        <a class="back-link" href="index.html">Back to website <span aria-hidden="true">↗</span></a>
+      </div>
+    </header>
+
+    <main>
+      <section class="welcome">
+        <p class="eyebrow">THE REFRAME LIFE CLIENT SPACE</p>
+        <h1>A little space to help<br>you <em>feel your best.</em></h1>
+        <p class="welcome-copy">Recipes, inspiration and practical resources to make healthy habits feel like a natural part of everyday life.</p>
+        <div class="welcome-note"><span class="note-star">✦</span><span>This is a design preview. Secure member login will be connected before this is made available to clients.</span></div>
+      </section>
+
+      <section class="quick-links" aria-label="Resource sections">
+        <a href="#recipes" class="quick-card quick-card-featured"><span class="quick-icon">✳</span><span><strong>The Reframe Kitchen</strong><small>Explore recipes for real life</small></span><b aria-hidden="true">↗</b></a>
+        <a href="#guides" class="quick-card"><span class="quick-icon">✧</span><span><strong>Nutrition guides</strong><small>Simple, useful know-how</small></span><b aria-hidden="true">↗</b></a>
+        <a href="#planning" class="quick-card"><span class="quick-icon">⌁</span><span><strong>Meal planning</strong><small>Ideas to make the week easier</small></span><b aria-hidden="true">↗</b></a>
+      </section>
+
+      <section class="section recipes-section" id="recipes">
+        <div class="section-heading">
+          <div><p class="eyebrow">GOOD FOOD, NO FOOD RULES</p><h2>The Reframe <em>Kitchen.</em></h2><p class="section-intro">Everyday recipes with lovely ingredients, plenty of flavour and room to make them your own.</p></div>
+          <span class="recipe-count" id="recipeCount">06 RECIPES</span>
+        </div>
+        <div class="recipe-tools">
+          <label class="search-wrap"><span aria-hidden="true">⌕</span><input id="recipeSearch" type="search" placeholder="Find a recipe or ingredient..." aria-label="Search recipes"></label>
+          <div class="filters" role="group" aria-label="Filter recipes">
+            <button class="filter active" data-filter="all" aria-pressed="true">All recipes</button>
+            <button class="filter" data-filter="breakfast" aria-pressed="false">Breakfast</button>
+            <button class="filter" data-filter="lunch" aria-pressed="false">Lunch</button>
+            <button class="filter" data-filter="dinner" aria-pressed="false">Dinner</button>
+            <button class="filter" data-filter="snacks" aria-pressed="false">Snacks &amp; sweet</button>
+          </div>
+        </div>
+
+        <div class="recipe-grid" id="recipeGrid">
+          <article class="recipe-card" data-category="breakfast" data-search="berry yoghurt breakfast bowl greek yogurt berries granola oats">
+            <div class="recipe-art art-berry"><span class="art-label">A FRESH START</span><span class="food-mark">✿</span></div>
+            <div class="recipe-info"><div class="recipe-meta"><span>BREAKFAST</span><span>10 MIN</span></div><h3>Berry yoghurt breakfast bowl</h3><p>Creamy yoghurt, seasonal berries and a little crunch.</p><button class="recipe-open" data-recipe="berry">View recipe <span>↗</span></button></div>
+          </article>
+          <article class="recipe-card" data-category="lunch" data-search="chicken fajita rice bowl peppers avocado lunch">
+            <div class="recipe-art art-fajita"><span class="art-label">MIDDAY FAVOURITE</span><span class="food-mark">✳</span></div>
+            <div class="recipe-info"><div class="recipe-meta"><span>LUNCH</span><span>25 MIN</span></div><h3>Chicken fajita rice bowl</h3><p>Colourful peppers, warmly spiced chicken and rice.</p><button class="recipe-open" data-recipe="fajita">View recipe <span>↗</span></button></div>
+          </article>
+          <article class="recipe-card" data-category="dinner" data-search="lemon salmon orzo spinach dinner pasta">
+            <div class="recipe-art art-salmon"><span class="art-label">WEEKDAY COMFORT</span><span class="food-mark">❋</span></div>
+            <div class="recipe-info"><div class="recipe-meta"><span>DINNER</span><span>30 MIN</span></div><h3>Lemon salmon orzo</h3><p>A bright, comforting one-pan dinner with spinach.</p><button class="recipe-open" data-recipe="salmon">View recipe <span>↗</span></button></div>
+          </article>
+          <article class="recipe-card" data-category="breakfast" data-search="overnight oats apple cinnamon breakfast">
+            <div class="recipe-art art-oats"><span class="art-label">MAKE-AHEAD MAGIC</span><span class="food-mark">✧</span></div>
+            <div class="recipe-info"><div class="recipe-meta"><span>BREAKFAST</span><span>5 MIN + CHILL</span></div><h3>Apple &amp; cinnamon overnight oats</h3><p>An easy breakfast ready and waiting in the fridge.</p><button class="recipe-open" data-recipe="oats">View recipe <span>↗</span></button></div>
+          </article>
+          <article class="recipe-card" data-category="dinner" data-search="crispy chickpea sweet potato tray bake vegetarian dinner">
+            <div class="recipe-art art-tray"><span class="art-label">PLANT-POWERED</span><span class="food-mark">❊</span></div>
+            <div class="recipe-info"><div class="recipe-meta"><span>DINNER</span><span>35 MIN</span></div><h3>Sweet potato &amp; chickpea traybake</h3><p>Hands-off cooking with a lovely mix of textures.</p><button class="recipe-open" data-recipe="tray">View recipe <span>↗</span></button></div>
+          </article>
+          <article class="recipe-card" data-category="snacks" data-search="chocolate banana yoghurt bites snack sweet">
+            <div class="recipe-art art-bites"><span class="art-label">A LITTLE SOMETHING</span><span class="food-mark">♡</span></div>
+            <div class="recipe-info"><div class="recipe-meta"><span>SNACKS &amp; SWEET</span><span>15 MIN + FREEZE</span></div><h3>Chocolate banana yoghurt bites</h3><p>A simple freezer treat for when you fancy something sweet.</p><button class="recipe-open" data-recipe="bites">View recipe <span>↗</span></button></div>
+          </article>
+        </div>
+        <p class="empty-state" id="emptyState" hidden>No recipes match that search yet. Try another ingredient or category.</p>
+        <p class="content-note">Recipe cards shown here are sample content for the prototype. Ingredients, quantities and nutritional details will be checked before publication.</p>
+      </section>
+
+      <section class="section lower-sections" id="guides">
+        <div class="lower-card"><p class="eyebrow">A LITTLE KNOW-HOW</p><h2>Nutrition, <em>made simpler.</em></h2><p>Friendly, evidence-informed guides to help you understand the basics and make choices that work for your life.</p><a href="#coming-soon">Explore nutrition guides <span>↗</span></a></div>
+        <div class="lower-card lower-card-dark" id="planning"><p class="eyebrow">MAKE SPACE FOR WHAT MATTERS</p><h2>A calmer kind<br>of <em>meal planning.</em></h2><p>Flexible planning prompts, shopping-list ideas and practical ways to make busy weeks feel easier.</p><a href="#coming-soon">Explore planning tools <span>↗</span></a></div>
+      </section>
+
+      <section class="coming-soon" id="coming-soon"><span>✦</span><p class="eyebrow">MORE TO COME</p><h2>Small steps. <em>Lasting habits.</em></h2><p>New recipes and resources will be added as the Reframe Life library grows.</p></section>
+    </main>
+    <footer class="hub-footer"><a class="brand" href="index.html">reframe <em>life</em></a><span>© 2026 Reframe Life</span><a href="index.html">Return to the main website ↑</a></footer>
+  </div>
+
+  <dialog class="recipe-dialog" id="recipeDialog" aria-labelledby="dialogTitle">
+    <button class="dialog-close" id="dialogClose" aria-label="Close recipe">×</button>
+    <p class="eyebrow" id="dialogCategory">RECIPE</p><h2 id="dialogTitle">Recipe title</h2><p id="dialogDescription" class="dialog-description"></p>
+    <div class="dialog-columns"><div><h3>You'll need</h3><ul id="dialogIngredients"></ul></div><div><h3>Let's make it</h3><ol id="dialogMethod"></ol></div></div>
+    <p class="dialog-footnote">Sample recipe preview. Final quantities and nutrition information should be verified before client use.</p>
+  </dialog>
+  <script src="client-hub.js"></script>
+</body>
+</html>
