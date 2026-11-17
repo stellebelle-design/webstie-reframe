@@ -136,7 +136,7 @@ async function loadPublishedRecipes(){
     return;
   }
   recipes = {};
-  (data || []).forEach((item, index) => {
+  for (const item of (data || [])) {
     const key = String(item.id);
     recipes[key] = {
       category: (item.category || "RECIPE").toUpperCase(),
@@ -195,7 +195,7 @@ async function loadPublishedRecipes(){
     info.append(meta, heading, description, open);
     card.append(art, info);
     grid.append(card);
-  });
+  }
   if (count) count.textContent = String((data || []).length).padStart(2, "0") + ((data || []).length === 1 ? " RECIPE" : " RECIPES");
   if (empty) {
     empty.hidden = (data || []).length !== 0;
