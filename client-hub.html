@@ -17,7 +17,7 @@
       <p class="eyebrow">THE REFRAME LIFE CLIENT SPACE</p>
       <h1>Your little space<br>to <em>feel your best.</em></h1>
       <p class="login-intro">Sign in below to explore your recipes and resources.</p>
-      <form id="loginForm">
+      <form id="loginForm" onsubmit="event.preventDefault()">
         <label for="loginEmail">Email address</label>
         <input id="loginEmail" type="email" autocomplete="email" required placeholder="you@example.com">
         <label for="loginPassword">Password</label>
@@ -144,6 +144,6 @@
   </dialog>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="client-hub.js"></script>
+  <script src="client-hub.js?v=20261117-loginfix2"></script>
 </body>
 </html>
