@@ -1,3 +1,71 @@
+// Secure sign-in gate: the hub stays hidden until Supabase confirms an active client.
+(async function initialiseClientAccess(){
+  const loginScreen = document.querySelector("#loginScreen");
+  const hubShell = document.querySelector("#hubShell");
+  const loginForm = document.querySelector("#loginForm");
+  const loginMessage = document.querySelector("#loginMessage");
+  const loginSubmit = document.querySelector("#loginSubmit");
+  const signOutButton = document.querySelector("#signOutButton");
+  const config = window.REFRAME_SUPABASE_CONFIG;
+  const showMessage = (message, isError = true) => {
+    if (!loginMessage) return;
+    loginMessage.textContent = message;
+    loginMessage.dataset.state = isError ? "error" : "success";
+  };
+  if (!window.supabase || !config?.url || !config?.publishableKey) {
+    showMessage("The sign-in service is not available just now. Please try again later.");
+    return;
+  }
+  const client = window.supabase.createClient(config.url, config.publishableKey);
+  async function checkAccess(session) {
+    if (!session?.user) {
+      hubShell.hidden = true;
+      loginScreen.hidden = false;
+      return false;
+    }
+    const { data, error } = await client
+      .from("client_access")
+      .select("status")
+      .eq("user_id", session.user.id)
+      .maybeSingle();
+    if (error || data?.status !== "active") {
+      await client.auth.signOut();
+      hubShell.hidden = true;
+      loginScreen.hidden = false;
+      showMessage("We couldn't verify active client access for this account. Please contact Reframe Life if you think this is a mistake.");
+      return false;
+    }
+    loginScreen.hidden = true;
+    hubShell.hidden = false;
+    return true;
+  }
+  const { data: { session } } = await client.auth.getSession();
+  await checkAccess(session);
+  loginForm?.addEventListener("submit", async event => {
+    event.preventDefault();
+    loginSubmit.disabled = true;
+    loginSubmit.textContent = "Signing in…";
+    showMessage("");
+    const email = document.querySelector("#loginEmail").value.trim();
+    const password = document.querySelector("#loginPassword").value;
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    if (error) {
+      showMessage("We couldn't sign you in with those details. Please check your email and password and try again.");
+    } else {
+      await checkAccess(data.session);
+    }
+    loginSubmit.disabled = false;
+    loginSubmit.innerHTML = 'Sign in <span>↗</span>';
+  });
+  signOutButton?.addEventListener("click", async () => {
+    await client.auth.signOut();
+    hubShell.hidden = true;
+    loginScreen.hidden = false;
+    document.querySelector("#loginPassword").value = "";
+    showMessage("You have been signed out.", false);
+  });
+})();
+
 const recipes = {
   berry: {category:"BREAKFAST",title:"Berry yoghurt breakfast bowl",description:"A fresh, flexible bowl for slow mornings or busy starts.",ingredients:["200g plain Greek-style yoghurt","A handful of mixed berries","30g granola or toasted oats","1 tsp nut butter or seeds (optional)"],method:["Spoon the yoghurt into a bowl.","Top with berries and granola.","Finish with nut butter or seeds, if you like."]},
   fajita: {category:"LUNCH",title:"Chicken fajita rice bowl",description:"A colourful, build-your-own bowl with plenty of flavour.",ingredients:["Chicken breast, sliced","Cooked rice","1 red pepper, sliced","½ red onion, sliced","Fajita seasoning","Lime and fresh coriander"],method:["Season the chicken and vegetables.","Cook in a hot pan until the chicken is thoroughly cooked and the vegetables are tender.","Serve over rice with lime and coriander."]},
