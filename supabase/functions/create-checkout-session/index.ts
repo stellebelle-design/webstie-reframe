@@ -39,6 +39,28 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Stripe has not been configured yet." }, { status: 500, headers: corsHeaders });
     }
 
+    const authorization = req.headers.get("authorization") || "";
+    const bearer = authorization.match(/^Bearer\\s+(.+)$/i)?.[1];
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
+    if (!bearer || !supabaseUrl || !supabaseAnonKey) {
+      return Response.json({ error: "Please sign in before starting checkout." }, { status: 401, headers: corsHeaders });
+    }
+
+    const authResponse = await fetch(new URL("/auth/v1/user", supabaseUrl), {
+      headers: {
+        "apikey": supabaseAnonKey,
+        "Authorization": "Bearer " + bearer,
+      },
+    });
+    if (!authResponse.ok) {
+      return Response.json({ error: "Your sign-in has expired. Please sign in again." }, { status: 401, headers: corsHeaders });
+    }
+    const user = await authResponse.json();
+    if (!user?.id || !user?.email) {
+      return Response.json({ error: "We couldn't verify your account. Please sign in again." }, { status: 401, headers: corsHeaders });
+    }
+
     const body = await req.json();
     const productKey = body?.productKey as ProductKey;
     if (!productKey || !Object.hasOwn(products, productKey)) {
@@ -64,9 +86,30 @@ Deno.serve(async (req) => {
       automatic_tax: { enabled: false },
       submit_type: "auto",
       integration_identifier: "custom_embedded_web_0001",
+      client_reference_id: user.id,
+      customer_email: user.email,
+      metadata: {
+        supabase_user_id: user.id,
+        product_key: productKey,
+      },
       ...(product.mode === "subscription"
-        ? { payment_method_collection: "always" as const }
-        : {}),
+        ? {
+            payment_method_collection: "always" as const,
+            subscription_data: {
+              metadata: {
+                supabase_user_id: user.id,
+                product_key: productKey,
+              },
+            },
+          }
+        : {
+            payment_intent_data: {
+              metadata: {
+                supabase_user_id: user.id,
+                product_key: productKey,
+              },
+            },
+          }),
     } as unknown as Stripe.Checkout.SessionCreateParams;
 
     const session = await stripe.checkout.sessions.create(sessionParams);
