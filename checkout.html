@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Secure Reframe Life coaching and personalised programme checkout.">
+  <title>Secure Checkout — Reframe Life</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500;600&family=Petit+Formal+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://js.stripe.com/dahlia/stripe.js"></script>
+</head>
+<body>
+  <header class="nav">
+    <a href="index.html" class="nav-logo">reframe <em>life</em></a>
+    <nav class="nav-links"><a href="index.html">Back to website</a></nav>
+  </header>
+  <main class="checkout-page" style="max-width:760px;margin:8rem auto 5rem;padding:0 1.5rem;">
+    <p class="eyebrow">PAY SECURELY</p>
+    <h1>Choose your <em>Reframe experience.</em></h1>
+    <p>Select your programme to continue to secure checkout. Your payment details are entered directly into Stripe's secure form.</p>
+    <section id="account-gate" class="service-card" style="margin:2rem 0;padding:2rem;">
+      <h2 id="account-heading">Create your account or sign in</h2>
+      <p id="account-intro">Please use an account to link your payment securely to your Reframe Life client space.</p>
+      <form id="account-form">
+        <label for="account-email">Email address</label>
+        <input id="account-email" type="email" autocomplete="email" required style="display:block;width:100%;margin:.4rem 0 1rem;padding:.8rem;">
+        <label for="account-password">Password</label>
+        <input id="account-password" type="password" autocomplete="new-password" minlength="8" required style="display:block;width:100%;margin:.4rem 0 1rem;padding:.8rem;">
+        <label id="confirm-password-label" for="account-confirm-password">Confirm password</label>
+        <input id="account-confirm-password" type="password" autocomplete="new-password" minlength="8" required style="display:block;width:100%;margin:.4rem 0 1rem;padding:.8rem;">
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+          <button class="btn btn-primary" id="create-account-button" type="submit">Create account</button>
+          <button class="btn" id="show-signin-button" type="button">I already have an account</button>
+        </div>
+      </form>
+      <p id="account-status" role="status" aria-live="polite"></p>
+      <div id="signed-in-summary" hidden>
+        <p id="signed-in-email"></p>
+        <button class="btn" id="account-signout-button" type="button">Sign out</button>
+      </div>
+    </section>
+    <div id="checkout-products" class="services-grid" style="margin:2rem 0;" hidden>
+      <article class="service-card"><h3>Personalised Training Programme</h3><p>One-off personalised programme.</p><strong>£30</strong><p><button class="btn btn-primary" data-product="personalised_programme">Continue</button></p></article>
+      <article class="service-card"><h3>4-Week Coaching</h3><p>Four weeks of personalised coaching.</p><strong>£119</strong><p><button class="btn btn-primary" data-product="coaching_4_week">Continue</button></p></article>
+      <article class="service-card"><h3>8-Week Coaching</h3><p>Eight weeks of personalised coaching.</p><strong>£219</strong><p><button class="btn btn-primary" data-product="coaching_8_week">Continue</button></p></article>
+      <article class="service-card"><h3>12-Week Coaching</h3><p>Twelve weeks of personalised coaching.</p><strong>£309</strong><p><button class="btn btn-primary" data-product="coaching_12_week">Continue</button></p></article>
+      <article class="service-card"><h3>6-Month Ongoing Coaching</h3><p>£99 monthly, with an initial six-month commitment. Terms apply.</p><strong>£99 / month</strong><p><button class="btn btn-primary" data-product="coaching_6_month">Continue</button></p></article>
+    </div>
+    <p id="checkout-status" role="status" aria-live="polite"></p>
+    <section id="checkout-panel" hidden style="margin-top:2rem;padding:2rem;background:#fff;border:1px solid #e8e2d9;">
+      <div id="checkout-form"></div>
+    </section>
+    <p style="margin-top:2rem;font-size:.9rem;">Payments are processed securely by Stripe. Please review the programme details and applicable terms before paying.</p>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="stripe-config.js"></script>
+  <script src="checkout.js"></script>
+</body>
+</html>
