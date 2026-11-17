@@ -6,6 +6,7 @@
   const loginMessage = document.querySelector("#loginMessage");
   const loginSubmit = document.querySelector("#loginSubmit");
   const signOutButton = document.querySelector("#signOutButton");
+  const adminPanel = document.querySelector("#adminPanel");
   const config = window.REFRAME_SUPABASE_CONFIG;
   const showMessage = (message, isError = true) => {
     if (!loginMessage) return;
@@ -38,7 +39,10 @@
     }
     loginScreen.hidden = true;
     hubShell.hidden = false;
+    const { data: adminRecord } = await client.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle();
+    if (adminPanel) adminPanel.hidden = !adminRecord;
     await loadPublishedRecipes();
+    if (adminRecord) await loadAdminRecipes();
     return true;
   }
   const { data: { session } } = await client.auth.getSession();
@@ -206,3 +210,107 @@ document.querySelector("#recipeGrid")?.addEventListener("click", event=>{
 });
 document.querySelector("#dialogClose")?.addEventListener("click",()=>dialog.close());
 dialog?.addEventListener("click",event=>{if(event.target===dialog) dialog.close();});
+
+/* Admin-only recipe management. Admin status is verified against the protected admin_users table. */
+(function initialiseRecipeManager(){
+  const client = window.reframeSupabaseClient;
+  const panel = document.querySelector("#adminPanel");
+  const form = document.querySelector("#recipeAdminForm");
+  if (!client || !panel || !form) return;
+  const byId = id => document.getElementById(id);
+  const message = text => { byId("adminMessage").textContent = text; };
+  const lines = value => value.split("\n").map(x => x.trim()).filter(Boolean);
+  async function uploadPhoto(file) {
+    if (!file) return null;
+    if (!["image/jpeg","image/png","image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      throw new Error("Please choose a JPG, PNG or WebP image under 5MB.");
+    }
+    const { data: userData } = await client.auth.getUser();
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+    const path = userData.user.id + "/" + Date.now() + "-" + safeName;
+    const { error } = await client.storage.from("client-resources").upload(path, file, { upsert:false, contentType:file.type });
+    if (error) throw error;
+    return path;
+  }
+  async function loadAdminRecipes(){
+    const list = byId("adminRecipeList");
+    list.textContent = "Loading recipes…";
+    const { data, error } = await client.from("recipes")
+      .select("id,title,category,is_published,description,ingredients,instructions,prep_minutes,cook_minutes,calories,protein,carbohydrates,fat,image_url")
+      .order("created_at",{ascending:false});
+    if (error) { list.textContent = "Couldn't load recipes: " + error.message; return; }
+    list.replaceChildren();
+    (data || []).forEach(recipe => {
+      const row = document.createElement("div"); row.className = "admin-recipe-row";
+      const details = document.createElement("div");
+      const title = document.createElement("strong"); title.textContent = recipe.title;
+      const status = document.createElement("small"); status.textContent = (recipe.category || "Other") + " · " + (recipe.is_published ? "Published" : "Unpublished");
+      details.append(title,status);
+      const actions = document.createElement("div"); actions.className = "admin-row-actions";
+      const edit = document.createElement("button"); edit.type="button"; edit.className="admin-row-button"; edit.textContent="Edit";
+      edit.addEventListener("click",()=>editRecipe(recipe));
+      const remove = document.createElement("button"); remove.type="button"; remove.className="admin-row-button"; remove.textContent="Delete";
+      remove.addEventListener("click",async()=>{
+        if (!window.confirm("Delete “" + recipe.title + "”? This cannot be undone.")) return;
+        const { error: deleteError } = await client.from("recipes").delete().eq("id",recipe.id);
+        if (deleteError) message("Couldn't delete recipe: " + deleteError.message);
+        else { message("Recipe deleted."); await loadAdminRecipes(); await loadPublishedRecipes(); }
+      });
+      actions.append(edit,remove); row.append(details,actions); list.append(row);
+    });
+    if (!data?.length) list.textContent = "No recipes yet. Add your first recipe above.";
+  }
+  function editRecipe(r){
+    byId("adminRecipeId").value=r.id;
+    byId("adminTitle").value=r.title || "";
+    byId("adminCategory").value=r.category || "breakfast";
+    byId("adminDescription").value=r.description || "";
+    byId("adminIngredients").value=(r.ingredients || []).join("\n");
+    byId("adminInstructions").value=(r.instructions || []).join("\n");
+    byId("adminPrep").value=r.prep_minutes ?? "";
+    byId("adminCook").value=r.cook_minutes ?? "";
+    byId("adminCalories").value=r.calories ?? "";
+    byId("adminProtein").value=r.protein ?? "";
+    byId("adminCarbs").value=r.carbohydrates ?? "";
+    byId("adminFat").value=r.fat ?? "";
+    byId("adminPublished").checked=!!r.is_published;
+    byId("adminCancel").hidden=false;
+    byId("adminSave").textContent="Update recipe";
+    form.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  function resetForm(){
+    form.reset(); byId("adminRecipeId").value="";
+    byId("adminCancel").hidden=true; byId("adminSave").textContent="Save recipe";
+  }
+  byId("adminCancel").addEventListener("click",()=>{resetForm();message("");});
+  form.addEventListener("submit",async event=>{
+    event.preventDefault(); byId("adminSave").disabled=true; message("Saving…");
+    try {
+      const id=byId("adminRecipeId").value;
+      const payload={
+        title:byId("adminTitle").value.trim(),
+        category:byId("adminCategory").value,
+        description:byId("adminDescription").value.trim(),
+        ingredients:lines(byId("adminIngredients").value),
+        instructions:lines(byId("adminInstructions").value),
+        prep_minutes:byId("adminPrep").value ? Number(byId("adminPrep").value) : null,
+        cook_minutes:byId("adminCook").value ? Number(byId("adminCook").value) : null,
+        calories:byId("adminCalories").value ? Number(byId("adminCalories").value) : null,
+        protein:byId("adminProtein").value ? Number(byId("adminProtein").value) : null,
+        carbohydrates:byId("adminCarbs").value ? Number(byId("adminCarbs").value) : null,
+        fat:byId("adminFat").value ? Number(byId("adminFat").value) : null,
+        is_published:byId("adminPublished").checked
+      };
+      const file=byId("adminImage").files[0];
+      if(file) payload.image_url=await uploadPhoto(file);
+      const result=id
+        ? await client.from("recipes").update(payload).eq("id",id)
+        : await client.from("recipes").insert(payload);
+      if(result.error) throw result.error;
+      message(id ? "Recipe updated." : "Recipe added.");
+      resetForm(); await loadAdminRecipes(); await loadPublishedRecipes();
+    } catch(error) { message("Couldn't save: " + (error.message || "Please try again.")); }
+    finally { byId("adminSave").disabled=false; }
+  });
+  window.loadAdminRecipes=loadAdminRecipes;
+})();
