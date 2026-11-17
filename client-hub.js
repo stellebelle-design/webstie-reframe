@@ -1,4 +1,5 @@
-// Secure sign-in gate: the hub stays hidden until Supabase confirms an active client.
+// Secure sign-in gate: attach the form handler immediately so a slow session restore
+// can never make the browser submit/reload the login form by itself.
 (async function initialiseClientAccess(){
   const loginScreen = document.querySelector("#loginScreen");
   const hubShell = document.querySelector("#hubShell");
@@ -13,12 +14,15 @@
     loginMessage.textContent = message;
     loginMessage.dataset.state = isError ? "error" : "success";
   };
+
   if (!window.supabase || !config?.url || !config?.publishableKey) {
     showMessage("The sign-in service is not available just now. Please try again later.");
     return;
   }
+
   const client = window.supabase.createClient(config.url, config.publishableKey);
   window.reframeSupabaseClient = client;
+
   async function checkAccess(session) {
     if (!session?.user) {
       hubShell.hidden = true;
@@ -45,31 +49,57 @@
     if (adminRecord && window.loadAdminRecipes) await window.loadAdminRecipes();
     return true;
   }
-  const { data: { session } } = await client.auth.getSession();
-  await checkAccess(session);
+
+  // Register this before awaiting getSession(): otherwise a stalled session restore
+  // leaves the form with its browser-default submit/reload behaviour.
   loginForm?.addEventListener("submit", async event => {
     event.preventDefault();
-    loginSubmit.disabled = true;
-    loginSubmit.textContent = "Signing in…";
-    showMessage("");
-    const email = document.querySelector("#loginEmail").value.trim();
-    const password = document.querySelector("#loginPassword").value;
-    const { data, error } = await client.auth.signInWithPassword({ email, password });
-    if (error) {
-      showMessage("We couldn't sign you in with those details. Please check your email and password and try again.");
-    } else {
-      await checkAccess(data.session);
+    if (loginSubmit) {
+      loginSubmit.disabled = true;
+      loginSubmit.textContent = "Signing in…";
     }
-    loginSubmit.disabled = false;
-    loginSubmit.innerHTML = 'Sign in <span>↗</span>';
+    showMessage("");
+    try {
+      const email = document.querySelector("#loginEmail").value.trim();
+      const password = document.querySelector("#loginPassword").value;
+      const { data, error } = await client.auth.signInWithPassword({ email, password });
+      if (error) {
+        console.error("Reframe Life sign-in error:", error);
+        showMessage("We couldn't sign you in. Please check your details or try again shortly.");
+      } else {
+        await checkAccess(data.session);
+      }
+    } catch (error) {
+      console.error("Reframe Life sign-in could not complete:", error);
+      showMessage("The sign-in service didn't respond. Please wait a moment and try again.");
+    } finally {
+      if (loginSubmit) {
+        loginSubmit.disabled = false;
+        loginSubmit.innerHTML = 'Sign in <span>↗</span>';
+      }
+    }
   });
+
   signOutButton?.addEventListener("click", async () => {
-    await client.auth.signOut();
-    hubShell.hidden = true;
-    loginScreen.hidden = false;
-    document.querySelector("#loginPassword").value = "";
-    showMessage("You have been signed out.", false);
+    try {
+      await client.auth.signOut();
+      hubShell.hidden = true;
+      loginScreen.hidden = false;
+      document.querySelector("#loginPassword").value = "";
+      showMessage("You have been signed out.", false);
+    } catch (error) {
+      console.error("Reframe Life sign-out error:", error);
+      showMessage("We couldn't complete sign-out. Please refresh the page.");
+    }
   });
+
+  try {
+    const { data: { session } } = await client.auth.getSession();
+    await checkAccess(session);
+  } catch (error) {
+    console.error("Reframe Life session restore error:", error);
+    showMessage("We couldn't restore your previous session. Please try signing in below.");
+  }
 })();
 
 let recipes = {
