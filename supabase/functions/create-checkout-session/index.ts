@@ -1,10 +1,17 @@
 import Stripe from "npm:stripe@latest";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://www.reframelifecoaching.co.uk",
+const allowedOrigins = new Set([
+  "https://www.reframelifecoaching.co.uk",
+  "https://reframelifecoaching.co.uk",
+]);
+const corsHeadersFor = (origin: string | null) => ({
+  "Access-Control-Allow-Origin": origin && allowedOrigins.has(origin)
+    ? origin
+    : "https://www.reframelifecoaching.co.uk",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+  "Vary": "Origin",
+});
 
 const products = {
   personalised_programme: { priceEnv: "STRIPE_PRICE_PERSONALISED_PROGRAMME", mode: "payment" },
@@ -17,6 +24,7 @@ const products = {
 type ProductKey = keyof typeof products;
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsHeadersFor(req.headers.get("origin"));
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -47,22 +55,19 @@ Deno.serve(async (req) => {
       apiVersion: "2026-03-25.dahlia" as never,
     });
 
-    const sessionParams: Stripe.Checkout.SessionCreateParams = {
-      ui_mode: "form" as never,
+    const sessionParams = {
+      ui_mode: "form",
       mode: product.mode,
       line_items: [{ price: priceId, quantity: 1 }],
       billing_address_collection: "auto",
       phone_number_collection: { enabled: false },
       automatic_tax: { enabled: false },
       submit_type: "auto",
-      // Checkout Studio integration identifier supplied for this embedded form.
-      // @ts-expect-error Checkout Studio parameter is newer than some SDK type definitions.
       integration_identifier: "custom_embedded_web_0001",
-    };
-
-    if (product.mode === "subscription") {
-      sessionParams.payment_method_collection = "always";
-    }
+      ...(product.mode === "subscription"
+        ? { payment_method_collection: "always" as const }
+        : {}),
+    } as unknown as Stripe.Checkout.SessionCreateParams;
 
     const session = await stripe.checkout.sessions.create(sessionParams);
     if (!session.client_secret) {
