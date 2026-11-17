@@ -42,7 +42,7 @@
     const { data: adminRecord } = await client.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle();
     if (adminPanel) adminPanel.hidden = !adminRecord;
     await loadPublishedRecipes();
-    if (adminRecord) await loadAdminRecipes();
+    if (adminRecord && window.loadAdminRecipes) await window.loadAdminRecipes();
     return true;
   }
   const { data: { session } } = await client.auth.getSession();
@@ -122,7 +122,8 @@ async function loadPublishedRecipes(){
     const art = document.createElement("div");
     art.className = "recipe-art art-berry";
     if (item.image_url) {
-      art.style.backgroundImage = 'url("' + item.image_url.replace(/"/g, "%22") + '")';
+      const { data: signedImage } = await window.reframeSupabaseClient.storage.from("client-resources").createSignedUrl(item.image_url, 3600);
+      if (signedImage?.signedUrl) art.style.backgroundImage = 'url("' + signedImage.signedUrl.replace(/"/g, "%22") + '")';
       art.style.backgroundSize = "cover";
       art.style.backgroundPosition = "center";
     } else {
