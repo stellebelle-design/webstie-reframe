@@ -163,10 +163,10 @@ async function loadPublishedRecipes(){
 }
 
 const search = document.querySelector("#recipeSearch");
-const cards = [...document.querySelectorAll(".recipe-card")];
 const filters = [...document.querySelectorAll(".filter")];
 let activeFilter = "all";
 function filterRecipes(){
+  const cards = [...document.querySelectorAll("#recipeGrid .recipe-card")];
   const term = (search?.value || "").trim().toLowerCase();
   let visible = 0;
   cards.forEach(card=>{
