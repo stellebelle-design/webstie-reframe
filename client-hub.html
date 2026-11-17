@@ -11,11 +11,29 @@
   <link rel="stylesheet" href="client-hub.css">
 </head>
 <body>
-  <div class="hub-shell">
+  <section class="login-screen" id="loginScreen">
+    <a class="brand login-brand" href="index.html">reframe <em>life</em></a>
+    <div class="login-card">
+      <p class="eyebrow">THE REFRAME LIFE CLIENT SPACE</p>
+      <h1>Your little space<br>to <em>feel your best.</em></h1>
+      <p class="login-intro">Sign in below to explore your recipes and resources.</p>
+      <form id="loginForm">
+        <label for="loginEmail">Email address</label>
+        <input id="loginEmail" type="email" autocomplete="email" required placeholder="you@example.com">
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Your password">
+        <button class="login-submit" id="loginSubmit" type="submit">Sign in <span>↗</span></button>
+        <p class="login-message" id="loginMessage" role="status" aria-live="polite"></p>
+      </form>
+      <p class="login-help">Access is available to active Reframe Life clients. If you need an account, please contact us.</p>
+    </div>
+    <a class="login-back" href="index.html">← Return to the main website</a>
+  </section>
+  <div class="hub-shell" id="hubShell" hidden>
     <header class="hub-header">
       <a class="brand" href="index.html" aria-label="Reframe Life home">reframe <em>life</em></a>
       <div class="header-right">
-        <span class="preview-label"><span></span> Design preview</span>
+        <button class="sign-out" id="signOutButton" type="button">Sign out</button>
         <a class="back-link" href="index.html">Back to website <span aria-hidden="true">↗</span></a>
       </div>
     </header>
@@ -25,7 +43,7 @@
         <p class="eyebrow">THE REFRAME LIFE CLIENT SPACE</p>
         <h1>A little space to help<br>you <em>feel your best.</em></h1>
         <p class="welcome-copy">Recipes, inspiration and practical resources to make healthy habits feel like a natural part of everyday life.</p>
-        <div class="welcome-note"><span class="note-star">✦</span><span>This is a design preview. Secure member login will be connected before this is made available to clients.</span></div>
+        <div class="welcome-note"><span class="note-star">✦</span><span>Your Reframe Life client space.</span></div>
       </section>
 
       <section class="quick-links" aria-label="Resource sections">
@@ -96,6 +114,8 @@
     <div class="dialog-columns"><div><h3>You'll need</h3><ul id="dialogIngredients"></ul></div><div><h3>Let's make it</h3><ol id="dialogMethod"></ol></div></div>
     <p class="dialog-footnote">Sample recipe preview. Final quantities and nutrition information should be verified before client use.</p>
   </dialog>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <script src="client-hub.js"></script>
 </body>
 </html>
