@@ -503,3 +503,40 @@ a:focus-visible, button:focus-visible {
 .experience-step p { font-size: 0.96rem; }
 .experience-note { max-width: 680px; margin: 52px auto 0; text-align: center; font-size: 0.9rem; color: var(--stone); }
 @media (max-width: 860px) { .experience-steps { grid-template-columns: 1fr; gap: 28px; } }
+
+
+/* PROGRAMME PURCHASE LINKS */
+.nav-buy-link {
+  border: 1px solid var(--stone);
+  padding: 9px 16px !important;
+  margin-top: -9px;
+}
+.nav-buy-link::after { display: none; }
+.nav-buy-link:hover { background: var(--ink); color: var(--cream) !important; }
+.programme-grid { align-items: stretch; }
+.programme-card { display: flex; flex-direction: column; align-items: flex-start; }
+.programme-card > p:not(.service-tag) { margin-bottom: 16px; }
+.programme-price {
+  margin-top: auto;
+  padding: 12px 0 20px;
+  font-family: var(--serif);
+  font-size: 2rem;
+  color: var(--ink);
+}
+.programme-price span {
+  font-family: var(--sans);
+  font-size: .85rem;
+  color: var(--ink-soft);
+}
+.programme-card .btn { margin-top: 4px; }
+.programme-card-featured { border-color: var(--stone); }
+.checkout-test-notice {
+  max-width: var(--max);
+  margin: 26px auto 0;
+  text-align: center;
+  font-size: .85rem;
+  color: var(--stone);
+}
+@media (max-width: 860px) {
+  .nav-buy-link { display: inline-block; width: fit-content; }
+}
