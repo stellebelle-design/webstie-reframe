@@ -44,7 +44,7 @@
     const { data: adminRecord } = await client.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle();
     if (adminPanel) adminPanel.hidden = !adminRecord;
     window.reframeIsAdmin = !!adminRecord;
-    await loadPublishedRecipes({ isAdmin: window.reframeIsAdmin });
+    await loadPublishedRecipes({ isAdmin: window.reframeIsAdmin, userId: session.user.id });
     if (adminRecord && window.loadAdminRecipes) await window.loadAdminRecipes();
     return true;
   }
@@ -119,7 +119,7 @@ let recipes = {
   bites: {category:"SNACKS & SWEET",title:"Chocolate banana yoghurt bites",description:"A simple freezer treat for when you fancy something sweet.",ingredients:["1 banana","A few spoonfuls of thick yoghurt","Melted dark chocolate","Optional chopped nuts or coconut"],method:["Slice the banana and arrange on a lined tray.","Add a small spoonful of yoghurt to each slice and freeze until firm.","Drizzle with melted chocolate and return to the freezer until set."]}
 };
 
-async function loadPublishedRecipes({ isAdmin = window.reframeIsAdmin === true } = {}){
+async function loadPublishedRecipes({ isAdmin = window.reframeIsAdmin === true, userId = null } = {}){
   const grid = document.querySelector("#recipeGrid");
   const count = document.querySelector("#recipeCount");
   const empty = document.querySelector("#emptyState");
@@ -132,7 +132,8 @@ async function loadPublishedRecipes({ isAdmin = window.reframeIsAdmin === true }
   if (!isAdmin) {
     const { data: purchases, error: purchaseError } = await window.reframeSupabaseClient
       .from("client_purchases")
-      .select("product_key,payment_status,created_at");
+      .select("product_key,payment_status,created_at")
+      .eq("user_id", userId || (await window.reframeSupabaseClient.auth.getUser()).data.user?.id || "");
     if (purchaseError) {
       if (count) count.textContent = "RECIPES";
       if (empty) { empty.hidden = false; empty.textContent = "We couldn't check your Recipe Bank access just now. Please refresh and try again."; }
