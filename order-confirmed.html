@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Your Reframe Life order confirmation.">
+  <title>Order Confirmed — Reframe Life</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500;600&family=Petit+Formal+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <a href="index.html" class="nav-logo">reframe <em>life</em></a>
+    <nav class="nav-links"><a href="index.html">Back to website</a></nav>
+  </header>
+  <main class="checkout-page" style="max-width:720px;margin:8rem auto 5rem;padding:0 1.5rem;text-align:center;">
+    <section class="service-card" style="padding:3rem 2rem;">
+      <p class="eyebrow">REFRAME LIFE</p>
+      <div aria-hidden="true" style="font-size:2.5rem;margin:1rem 0;">✓</div>
+      <h1>Order <em>confirmed.</em></h1>
+      <p>Thank you for choosing Reframe Life. Your checkout is complete and your payment has been submitted successfully.</p>
+      <p id="confirmed-programme" style="font-weight:500;margin:1.5rem 0;"></p>
+      <p>We'll be in touch using the email address you provided with the next steps.</p>
+      <p style="margin-top:2rem;"><a class="btn btn-primary" href="index.html">Return to Reframe Life</a></p>
+    </section>
+  </main>
+  <script>
+    const programmes = {
+      personalised_programme: "Personalised Training Programme",
+      coaching_4_week: "4-Week Coaching Programme",
+      coaching_8_week: "8-Week Coaching Programme",
+      coaching_12_week: "12-Week Coaching Programme",
+      coaching_6_month: "6-Month Ongoing Coaching"
+    };
+    const selected = new URLSearchParams(window.location.search).get("programme");
+    if (programmes[selected]) {
+      document.querySelector("#confirmed-programme").textContent = "Programme: " + programmes[selected];
+    }
+  </script>
+</body>
+</html>
