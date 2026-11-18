@@ -3,6 +3,7 @@ import Stripe from "npm:stripe@latest";
 const allowedOrigins = new Set([
   "https://www.reframelifecoaching.co.uk",
   "https://reframelifecoaching.co.uk",
+  "https://stellebelle-design.github.io",
 ]);
 const corsHeadersFor = (origin: string | null) => ({
   "Access-Control-Allow-Origin": origin && allowedOrigins.has(origin)
