@@ -43,7 +43,7 @@
     hubShell.hidden = false;
     const { data: adminRecord } = await client.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle();
     if (adminPanel) adminPanel.hidden = !adminRecord;
-    await loadPublishedRecipes();
+    await loadPublishedRecipes({ isAdmin: !!adminRecord });
     if (adminRecord && window.loadAdminRecipes) await window.loadAdminRecipes();
     return true;
   }
@@ -118,13 +118,62 @@ let recipes = {
   bites: {category:"SNACKS & SWEET",title:"Chocolate banana yoghurt bites",description:"A simple freezer treat for when you fancy something sweet.",ingredients:["1 banana","A few spoonfuls of thick yoghurt","Melted dark chocolate","Optional chopped nuts or coconut"],method:["Slice the banana and arrange on a lined tray.","Add a small spoonful of yoghurt to each slice and freeze until firm.","Drizzle with melted chocolate and return to the freezer until set."]}
 };
 
-async function loadPublishedRecipes(){
+async function loadPublishedRecipes({ isAdmin = false } = {}){
   const grid = document.querySelector("#recipeGrid");
   const count = document.querySelector("#recipeCount");
   const empty = document.querySelector("#emptyState");
+  const tools = document.querySelector(".recipe-tools");
+  const note = document.querySelector(".content-note");
   if (!grid) return;
   grid.replaceChildren();
   if (count) count.textContent = "LOADING";
+  let hasRecipeAccess = isAdmin;
+  if (!isAdmin) {
+    const { data: purchases, error: purchaseError } = await window.reframeSupabaseClient
+      .from("client_purchases")
+      .select("product_key,payment_status,created_at");
+    if (purchaseError) {
+      if (count) count.textContent = "RECIPES";
+      if (empty) { empty.hidden = false; empty.textContent = "We couldn't check your Recipe Bank access just now. Please refresh and try again."; }
+      return;
+    }
+    const now = Date.now();
+    const durations = {
+      coaching_4_week: 4 * 7 * 24 * 60 * 60 * 1000,
+      coaching_8_week: 8 * 7 * 24 * 60 * 60 * 1000,
+      coaching_12_week: 12 * 7 * 24 * 60 * 60 * 1000
+    };
+    hasRecipeAccess = (purchases || []).some(purchase => {
+      if (purchase.product_key === "coaching_6_month") return purchase.payment_status === "active";
+      const duration = durations[purchase.product_key];
+      if (!duration || purchase.payment_status !== "paid" || !purchase.created_at) return false;
+      const purchasedAt = new Date(purchase.created_at).getTime();
+      return Number.isFinite(purchasedAt) && now < purchasedAt + duration;
+    });
+  }
+  const lockedMessage = document.querySelector("#recipeAccessMessage");
+  if (!hasRecipeAccess) {
+    if (tools) tools.hidden = true;
+    grid.hidden = true;
+    if (note) note.hidden = true;
+    if (count) count.textContent = "COACHING ACCESS";
+    if (empty) empty.hidden = true;
+    let message = lockedMessage;
+    if (!message) {
+      message = document.createElement("div");
+      message.id = "recipeAccessMessage";
+      message.className = "empty-state";
+      message.setAttribute("role", "status");
+      grid.parentNode.insertBefore(message, grid);
+    }
+    message.hidden = false;
+    message.textContent = "The Reframe Kitchen is included with our coaching packages. If you believe you should have access, please contact Reframe Life and we'll be happy to help.";
+    return;
+  }
+  if (tools) tools.hidden = false;
+  grid.hidden = false;
+  if (note) note.hidden = false;
+  if (lockedMessage) lockedMessage.hidden = true;
   const { data, error } = await window.reframeSupabaseClient
     .from("recipes")
     .select("id,title,description,category,ingredients,instructions,image_url,prep_minutes,cook_minutes,calories,protein,carbohydrates,fat")
