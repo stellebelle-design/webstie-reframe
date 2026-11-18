@@ -43,7 +43,8 @@
     hubShell.hidden = false;
     const { data: adminRecord } = await client.from("admin_users").select("user_id").eq("user_id", session.user.id).maybeSingle();
     if (adminPanel) adminPanel.hidden = !adminRecord;
-    await loadPublishedRecipes({ isAdmin: !!adminRecord });
+    window.reframeIsAdmin = !!adminRecord;
+    await loadPublishedRecipes({ isAdmin: window.reframeIsAdmin });
     if (adminRecord && window.loadAdminRecipes) await window.loadAdminRecipes();
     return true;
   }
@@ -118,7 +119,7 @@ let recipes = {
   bites: {category:"SNACKS & SWEET",title:"Chocolate banana yoghurt bites",description:"A simple freezer treat for when you fancy something sweet.",ingredients:["1 banana","A few spoonfuls of thick yoghurt","Melted dark chocolate","Optional chopped nuts or coconut"],method:["Slice the banana and arrange on a lined tray.","Add a small spoonful of yoghurt to each slice and freeze until firm.","Drizzle with melted chocolate and return to the freezer until set."]}
 };
 
-async function loadPublishedRecipes({ isAdmin = false } = {}){
+async function loadPublishedRecipes({ isAdmin = window.reframeIsAdmin === true } = {}){
   const grid = document.querySelector("#recipeGrid");
   const count = document.querySelector("#recipeCount");
   const empty = document.querySelector("#emptyState");
