@@ -68,7 +68,16 @@
       const { data, error } = await client.auth.signInWithPassword({ email, password });
       if (error) {
         console.error("Reframe Life sign-in error:", error);
-        showMessage("We couldn't sign you in. Please check your details or try again shortly.");
+        const authMessage = String(error.message || "").toLowerCase();
+        if (authMessage.includes("invalid login credentials")) {
+          showMessage("The email address or password wasn't recognised. Please check both and try again.");
+        } else if (authMessage.includes("email not confirmed")) {
+          showMessage("This email address hasn't been confirmed yet. Please check your inbox for the confirmation email.");
+        } else if (authMessage.includes("too many requests")) {
+          showMessage("There have been too many sign-in attempts. Please wait a few minutes before trying again.");
+        } else {
+          showMessage("Sign-in couldn't be completed: " + (error.message || "Please try again shortly."));
+        }
       } else {
         await checkAccess(data.session);
       }
