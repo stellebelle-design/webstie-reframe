@@ -225,13 +225,16 @@
         }
         form.on("confirm", async (event) => {
           try {
-            const confirmationUrl = new URL("order-confirmed.html", window.location.href);
-            confirmationUrl.searchParams.set("programme", button.dataset.product);
             const confirmationResult = await loadActionsResult.actions.confirm({
               formConfirmEvent: event,
-              returnUrl: confirmationUrl.href
+              redirect: "if_required"
             });
             if (confirmationResult?.type === "success") {
+              const confirmationUrl = new URL("order-confirmed.html", window.location.href);
+              confirmationUrl.searchParams.set("programme", button.dataset.product);
+              if (confirmationResult.session?.id) {
+                confirmationUrl.searchParams.set("session_id", confirmationResult.session.id);
+              }
               window.location.assign(confirmationUrl.href);
             } else if (confirmationResult?.type === "error") {
               const detail = confirmationResult.error?.message || "Please check your payment details and try again.";
